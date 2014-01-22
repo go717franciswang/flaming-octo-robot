@@ -1,10 +1,25 @@
 # realtime-chart
 
-A Clojure library designed to ... well, that part is up to you.
+Cljs chart plugin that continuously query multiple sources, and display each source using a simple Google line chart
 
 ## Usage
 
-FIXME
+```clj
+(let [options {:container "mydiv"
+               :width 600
+               :height 200
+               :transition-interval 20
+               :query-interval 60}
+      data-sources ["stockA.json"
+                    "stockB.json"
+                    "stockC.json"]]
+  (realtime-chart.core/setup-charts options data-sources))
+```
+
+## TODO
+* working prototype
+* cljs tests
+
 
 ## License
 
