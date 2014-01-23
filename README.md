@@ -43,9 +43,15 @@ realtime-chart.core.build_charts(options, data_sources);
 ## Development
 ```sh
 lein cljsbuild auto # rebuild when source is changed
+lein trampoline cljsbuild repl-listen # brepl will listen for connection on port 9000
+```
+connect to brepl with the following code
+```clj
+(.setOnLoadCallback js/google (fn [] (repl/connect "http://localhost:9000/repl")))
 ```
 
 ## TODO
+* if we were to represent the state of chart data as state of modal in http://rigsomelight.com/2013/07/18/clojurescript-core-async-todos.html, the state can contain data from all sources, and only one source will be visible at a given moment. furthermore, one async channel can trigger the moving visibility from one source to another, and another channel that requests data from server
 * working prototype
 * cljs tests
 * make it into a library so other cljs can use it

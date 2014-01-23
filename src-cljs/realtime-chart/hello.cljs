@@ -41,7 +41,7 @@
 
 (.load js/google "visualization" "1" (clj->js {:packages ["corechart"]}))
 (.setOnLoadCallback js/google draw-chart)
-(.setOnLoadCallback js/google #(my-get "test.json"))
+#_(.setOnLoadCallback js/google #(my-get "test.json"))
 
 
 
