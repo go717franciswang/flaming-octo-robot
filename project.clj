@@ -10,7 +10,7 @@
   :plugins [[lein-cljsbuild "1.0.1"]]
   :cljsbuild { 
     :builds [{:source-paths ["src-cljs"]
-              :compiler {:output-to "resources/public/js/main.js"
+              :compiler {:output-to "resources/public/js/realtime-chart.js"
                          ;:optimizations :whitespace
                          :optimizations :advanced
                          :externs ["externs/jquery-1.9.js"
