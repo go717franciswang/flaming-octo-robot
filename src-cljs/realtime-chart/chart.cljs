@@ -5,11 +5,11 @@
   (:use [jayq.core :only [$]]))
 
 (defn add-rows [rows]
-  #_(.log js/console (str "data for chart" rows))
+  ;(.log js/console (str "data for chart" rows))
   (let [data (js/google.visualization.DataTable.)]
     (.addColumn data "datetime" "Time")
     (.addColumn data "number" "Free Memory")
-    (.addRows data (clj->js rows))
+    (.addRows data (clj->js (seq rows)))
     data))
 
 (defn chart-options [title]

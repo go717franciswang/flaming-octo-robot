@@ -8,7 +8,8 @@
             [realtime-chart.chart :as c])
   (:require-macros [cljs.core.async.macros :as m :refer [go alt!]]))
 
-(.setOnLoadCallback js/google (fn [] (repl/connect "http://localhost:9000/repl")))
+#_(.setOnLoadCallback js/google (fn [] (repl/connect "http://localhost:9000/repl")))
+(.setOnLoadCallback js/google (fn [] (repl/connect "http://betalabs:9000/repl")))
 
 (defn data-chan [source-id url interval]
   (let [rc (chan)
@@ -32,21 +33,42 @@
     (query)
     rc))
 
+(defn get-oldest-timestamp [default-display display chart-data]
+  (let [display (or display default-display)
+        latest-time (-> chart-data first second last first)
+        latest-timestamp (.getTime latest-time)
+        oldest-timestamp (- latest-timestamp (* display 1000))]
+    oldest-timestamp))
+
+(defn filter-old-data [chart-data oldest-timestamp]
+  (reduce
+    (fn [chart-data [legend data]]
+      (let [outdated (seq (take-while #(< (.getTime %) oldest-timestamp) (keys data)))
+            data (apply dissoc data outdated)]
+        (assoc chart-data legend data)))
+    chart-data
+    chart-data))
+
 (defn update-charts-data [charts-data source-id raw-data]
-  (let [chart-data (get-in charts-data [:charts source-id :raw-data] {})
+  (let [chart (get-in charts-data [:charts source-id])
+        chart-data (get chart :raw-data {})
         new-chart-data (reduce
                          (fn [new-chart-data [legend data]]
-                           (let [original-data (get new-chart-data legend)]
+                           (let [original-data (get new-chart-data legend (sorted-map))]
                              (assoc new-chart-data legend (into original-data data))))
                          chart-data
-                         raw-data)]
-    (assoc-in charts-data [:charts source-id :raw-data] new-chart-data)))
+                         raw-data)
+        oldest-timestamp (get-oldest-timestamp (:display charts-data) (:display chart) new-chart-data)
+        latest-chart-data (filter-old-data new-chart-data oldest-timestamp)]
+    (assoc-in charts-data [:charts source-id :raw-data] latest-chart-data)))
 
 ; charts-data is structured as follow
-; {:visible 0
+; {:visible 0                           ; id of the chart that should be visible
 ;  :container-selector #mydiv
-;  :charts [{:title
-;            :url
+;  :display 10                          ; default seconds of chart data we should keep (rolling window size)
+;  :charts [{:title                     ; chart title
+;            :url                       ; GET request this url to get chart data
+;            :display 20                ; seconds of chart data we should keep
 ;            :raw-data {:legend1 {t1 v1 t2 v2 ...}
 ;                       :legend2 {t3 v3 t4 v4 ...}}}
 ;           ...]}
@@ -71,7 +93,8 @@
 
 (defn run []
   (let [options {:query-interval 1000
-                 :container-selector "#mydiv"}
+                 :container-selector "#mydiv"
+                 :display 60}
         data-sources [{:title "Free mem"
                        :url "freemem.php"}]]
     (build-charts options data-sources)))
