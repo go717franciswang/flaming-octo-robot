@@ -17,17 +17,13 @@
                    (let [response (.-target e)
                          text (.getResponseText response)
                          data (map 
-                                (fn [[legend tv]]
-                                  (let [norm-tv (map 
-                                                  (fn [[t v]]
-                                                    [(js/Date. (js/parseInt t)) v])
-                                                  tv)]
-                                    [legend norm-tv])) 
+                                (fn [[t v]]
+                                  [(js/Date. (js/parseInt t)) v])
                                 (js->clj (JSON/parse text)))]
-                     #_(.log js/console (str "sending data:" data))
+                     ;(.log js/console (str "sending data:" data))
                      (put! rc [:new-data source-id data])))
         query (fn q []
-                #_(.log js/console (str "querying:" url))
+                ;(.log js/console (str "querying:" url))
                 (xhr/send url receiver "GET")
                 (js/setTimeout q interval))]
     (query)
@@ -35,29 +31,19 @@
 
 (defn get-oldest-timestamp [default-display display chart-data]
   (let [display (or display default-display)
-        latest-time (-> chart-data first second last first)
+        latest-time (-> chart-data last first)
         latest-timestamp (.getTime latest-time)
-        oldest-timestamp (- latest-timestamp (* display 1000))]
+        oldest-timestamp (- latest-timestamp display)]
     oldest-timestamp))
 
 (defn filter-old-data [chart-data oldest-timestamp]
-  (reduce
-    (fn [chart-data [legend data]]
-      (let [outdated (seq (take-while #(< (.getTime %) oldest-timestamp) (keys data)))
-            data (apply dissoc data outdated)]
-        (assoc chart-data legend data)))
-    chart-data
-    chart-data))
+  (let [outdated (seq (take-while #(< (.getTime %) oldest-timestamp) (keys chart-data)))]
+    (apply dissoc chart-data outdated)))
 
 (defn update-charts-data [charts-data source-id raw-data]
   (let [chart (get-in charts-data [:charts source-id])
-        chart-data (get chart :raw-data {})
-        new-chart-data (reduce
-                         (fn [new-chart-data [legend data]]
-                           (let [original-data (get new-chart-data legend (sorted-map))]
-                             (assoc new-chart-data legend (into original-data data))))
-                         chart-data
-                         raw-data)
+        chart-data (get chart :raw-data (sorted-map))
+        new-chart-data (into chart-data raw-data)
         oldest-timestamp (get-oldest-timestamp (:display charts-data) (:display chart) new-chart-data)
         latest-chart-data (filter-old-data new-chart-data oldest-timestamp)]
     (assoc-in charts-data [:charts source-id :raw-data] latest-chart-data)))
@@ -65,13 +51,16 @@
 ; charts-data is structured as follow
 ; {:visible 0                           ; id of the chart that should be visible
 ;  :container-selector #mydiv
-;  :display 10                          ; default seconds of chart data we should keep (rolling window size)
+;  :gchart-options {...}                ; default options for google chart
+;  :display 10000                       ; default milli-seconds of chart data we should keep (rolling window size)
 ;  :charts [{:title                     ; chart title
 ;            :url                       ; GET request this url to get chart data
-;            :display 20                ; seconds of chart data we should keep
-;            :raw-data {:legend1 {t1 v1 t2 v2 ...}
-;                       :legend2 {t3 v3 t4 v4 ...}}}
-;           ...]}
+;            :gchart-options {...}      ; options for google chart
+;            :display 20000             ; milli-seconds of chart data we should keep
+;            :raw-data {t1: {:legend1 v1 :legend2 v2 ..}
+;                       t2: {:legend1 v1 :legend2 v2 ..}
+;                       ..}}
+;           {..}..]}
 
 (defn build-charts [options data-sources]
   (let [charts-data (conj options
@@ -85,8 +74,8 @@
       (loop [charts-data charts-data]
         (let [[[msg-name source-id data] rc] (alts! data-chans)
               new-charts-data (update-charts-data charts-data source-id data)]
-          #_(.log js/console (str "data: " new-charts-data))
-          #_(.log js/console (str "received msg" [msg-name source-id data]))
+          ;(.log js/console (str "data: " new-charts-data))
+          ;(.log js/console (str "received msg" [msg-name source-id data]))
           (when (not= charts-data new-charts-data)
             (c/draw-chart new-charts-data))
           (recur new-charts-data))))))
@@ -94,9 +83,23 @@
 (defn run []
   (let [options {:query-interval 1000
                  :container-selector "#mydiv"
-                 :display 60}
-        data-sources [{:title "Free mem"
-                       :url "freemem.php"}]]
+                 :gchart-options {:curveType "function"
+                                  :width 800
+                                  :height 300}
+                 :display 60000}
+        data-sources [{:gchart-options {:title "Memory Usage"}
+                       :url "freemem.php"
+                       :columns ["free mem"]}]]
+    (build-charts options data-sources))
+  (let [options {:query-interval 1000
+                 :container-selector "#mydiv2"
+                 :gchart-options {:curveType "function"
+                                  :width 800
+                                  :height 300}
+                 :display 60000}
+        data-sources [{:gchart-options {:title "Memory Usage"}
+                       :url "freemem.php"
+                       :columns ["free mem", "cached"]}]]
     (build-charts options data-sources)))
 
 (.setOnLoadCallback js/google run)

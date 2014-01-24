@@ -10,10 +10,16 @@ while ($line = fgets($fh)) {
     }
 }
 
-$free = $data['MemFree'] + $data['Cached'];
+$unallocated = (int) $data['MemFree'];
+$cached = (int) $data['Cached'];
+$free = $unallocated + $cached;
 $timestamp = time() . "000";
 
 header('Content-type: application/json');
-echo json_encode(array('free mem' => array($timestamp => $free)));
+echo json_encode(array($timestamp => array(
+    'free mem' => $free,
+    'unallocated' => $unallocated,
+    'cached' => $cached,
+)));
 
 ?>
