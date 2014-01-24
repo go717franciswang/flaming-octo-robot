@@ -29,6 +29,16 @@
     (query)
     rc))
 
+(defn transition-chan [interval start-source-id source-count]
+  (let [rc (chan)
+        transition (fn t [source-id]
+                     (put! rc [:transition source-id source-count])
+                     (let [next-source-id (mod (inc source-id) source-count)]
+                       (js/setTimeout #(t next-source-id)  interval)))]
+  (when (and interval (> source-count 1))
+      (transition start-source-id))
+    rc))
+
 (defn get-oldest-timestamp [default-display display chart-data]
   (let [display (or display default-display)
         latest-time (-> chart-data last first)
@@ -48,11 +58,21 @@
         latest-chart-data (filter-old-data new-chart-data oldest-timestamp)]
     (assoc-in charts-data [:charts source-id :raw-data] latest-chart-data)))
 
+(defn transition-charts [old-charts-data new-charts-data]
+  (if (not= (:visible old-charts-data) (:visible new-charts-data))
+    (c/fade-out-chart old-charts-data 
+                      (fn []
+                        (c/draw-chart new-charts-data)
+                        (c/fade-in-chart new-charts-data)))
+    (when (not= old-charts-data new-charts-data)
+      (c/draw-chart new-charts-data))))
+
 ; charts-data is structured as follow
 ; {:visible 0                           ; id of the chart that should be visible
 ;  :container-selector #mydiv
 ;  :gchart-options {...}                ; default options for google chart
 ;  :display 10000                       ; default milli-seconds of chart data we should keep (rolling window size)
+;  :interval 5000                       : transition to next chart after this many milliseconds
 ;  :charts [{:title                     ; chart title
 ;            :url                       ; GET request this url to get chart data
 ;            :gchart-options {...}      ; options for google chart
@@ -69,15 +89,18 @@
         data-chans (for [source-id (range (count data-sources))
                          :let [data-source (get data-sources source-id)
                                url (:url data-source)]]
-                     (data-chan source-id url (:query-interval options)))]
+                     (data-chan source-id url (:query-interval options)))
+        transition-chan (transition-chan (:interval charts-data) 0 (count data-sources))
+        all-chans (conj data-chans transition-chan)]
     (go
       (loop [charts-data charts-data]
-        (let [[[msg-name source-id data] rc] (alts! data-chans)
-              new-charts-data (update-charts-data charts-data source-id data)]
+        (let [[[msg-name source-id data] rc] (alts! all-chans)
+              new-charts-data (if (= msg-name :new-data)
+                                (update-charts-data charts-data source-id data)
+                                (assoc charts-data :visible source-id))]
           ;(.log js/console (str "data: " new-charts-data))
           ;(.log js/console (str "received msg" [msg-name source-id data]))
-          (when (not= charts-data new-charts-data)
-            (c/draw-chart new-charts-data))
+          (transition-charts charts-data new-charts-data)
           (recur new-charts-data))))))
 
 (defn run []
@@ -87,7 +110,7 @@
                                   :width 800
                                   :height 300}
                  :display 60000}
-        data-sources [{:gchart-options {:title "Memory Usage"}
+        data-sources [{:gchart-options {:title "Memory Usage (60 sec window)"}
                        :url "freemem.php"
                        :columns ["free mem"]}]]
     (build-charts options data-sources))
@@ -96,8 +119,23 @@
                  :gchart-options {:curveType "function"
                                   :width 800
                                   :height 300}
-                 :display 60000}
-        data-sources [{:gchart-options {:title "Memory Usage"}
+                 :display 30000}
+        data-sources [{:gchart-options {:title "Memory Usage (30 sec window)"}
+                       :url "freemem.php"
+                       :columns ["free mem", "cached"]}]]
+    (build-charts options data-sources))
+  (let [options {:query-interval 1000
+                 :container-selector "#mydiv3"
+                 :gchart-options {:curveType "function"
+                                  :width 800
+                                  :height 300}
+                 :interval 5000
+                 :display 30000}
+        data-sources [{:gchart-options {:title "Memory Usage (60 sec window)"}
+                       :url "freemem.php"
+                       :columns ["free mem"]
+                       :display 60000}
+                      {:gchart-options {:title "Memory Usage (30 sec window)"}
                        :url "freemem.php"
                        :columns ["free mem", "cached"]}]]
     (build-charts options data-sources)))

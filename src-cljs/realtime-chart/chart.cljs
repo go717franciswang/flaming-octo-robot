@@ -2,7 +2,7 @@
   (:require [domina :as dom]
             [domina.xpath :as xpath]
             [goog.net.XhrIo :as xhr])
-  (:use [jayq.core :only [$]]))
+  (:use [jayq.core :only [$ fade-out fade-in]]))
 
 (defn add-rows [chart]
   (let [rows (:raw-data chart)
@@ -31,7 +31,6 @@
 (.load js/google "visualization" "1" (clj->js {:packages ["corechart"]}))
 #_(.setOnLoadCallback js/google #(my-get "test.json"))
 
-
 (defn draw-chart [charts-data]
   (let [visible-chart-id (:visible charts-data)
         visible-chart (get-in charts-data [:charts visible-chart-id])
@@ -41,3 +40,8 @@
         data (add-rows visible-chart)]
     (.draw chart data options)))
 
+(defn fade-out-chart [charts-data onfinish]
+  (fade-out ($ (:container-selector charts-data)) 400 onfinish))
+
+(defn fade-in-chart [charts-data]
+  (fade-in ($ (:container-selector charts-data)) 400 #()))
