@@ -37,13 +37,15 @@ Cljs chart plugin that continuously query multiple sources, and display each sou
 ```
 #### or call in js
 ```js
-realtime-chart.core.build_charts(options, data_sources);
+realtime_chart.core.build_charts(options, data_sources);
 ```
 
 ## Development
 ```sh
 lein cljsbuild auto # rebuild when source is changed
-lein trampoline cljsbuild repl-listen # brepl will listen for connection on port 9000
+
+# brepl will listen for connection on port 9000
+rlwrap -r -m -q '\\"' -b "(){}[],^%3@\\\";:'" lein trampoline cljsbuild repl-listen
 ```
 connect to brepl with the following code
 ```clj
