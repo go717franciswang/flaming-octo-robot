@@ -8,7 +8,7 @@
             [realtime-chart.chart :as c])
   (:require-macros [cljs.core.async.macros :as m :refer [go alt!]]))
 
-#_(.setOnLoadCallback js/google (fn [] (repl/connect "http://localhost:9000/repl")))
+;(.setOnLoadCallback js/google (fn [] (repl/connect "http://localhost:9000/repl")))
 (.setOnLoadCallback js/google (fn [] (repl/connect "http://betalabs:9000/repl")))
 
 (defn data-chan [source-id url interval]
@@ -20,10 +20,8 @@
                                 (fn [[t v]]
                                   [(js/Date. (js/parseInt t)) v])
                                 (js->clj (JSON/parse text)))]
-                     ;(.log js/console (str "sending data:" data))
                      (put! rc [:new-data source-id data])))
         query (fn q []
-                ;(.log js/console (str "querying:" url))
                 (xhr/send url receiver "GET")
                 (js/setTimeout q interval))]
     (query)
@@ -58,14 +56,24 @@
         latest-chart-data (filter-old-data new-chart-data oldest-timestamp)]
     (assoc-in charts-data [:charts source-id :raw-data] latest-chart-data)))
 
-(defn transition-charts [old-charts-data new-charts-data]
-  (if (not= (:visible old-charts-data) (:visible new-charts-data))
-    (c/fade-out-chart old-charts-data 
-                      (fn []
-                        (c/draw-chart new-charts-data)
-                        (c/fade-in-chart new-charts-data)))
-    (when (not= old-charts-data new-charts-data)
-      (c/draw-chart new-charts-data))))
+(defn wait-for [target input-chan]
+  (loop []
+    (go (let [msg (<! input-chan)]
+          (if (= msg target)
+            msg
+            (recur))))))
+
+(defn transition-charts [old-charts-data new-charts-data fading?]
+  (when (not @fading?)
+    (if (not= (:visible old-charts-data) (:visible new-charts-data))
+      (do
+        (reset! fading? true)
+        (c/fade-out-chart old-charts-data
+                          (fn []
+                            (c/draw-chart new-charts-data)
+                            (c/fade-in-chart new-charts-data #(reset! fading? false)))))
+      (when (not= old-charts-data new-charts-data)
+        (c/draw-chart new-charts-data)))))
 
 ; charts-data is structured as follow
 ; {:visible 0                           ; id of the chart that should be visible
@@ -91,16 +99,15 @@
                                url (:url data-source)]]
                      (data-chan source-id url (:query-interval options)))
         transition-chan (transition-chan (:interval charts-data) 0 (count data-sources))
-        all-chans (conj data-chans transition-chan)]
+        all-chans (conj data-chans transition-chan)
+        fading? (atom false)]
     (go
       (loop [charts-data charts-data]
         (let [[[msg-name source-id data] rc] (alts! all-chans)
               new-charts-data (if (= msg-name :new-data)
                                 (update-charts-data charts-data source-id data)
                                 (assoc charts-data :visible source-id))]
-          ;(.log js/console (str "data: " new-charts-data))
-          ;(.log js/console (str "received msg" [msg-name source-id data]))
-          (transition-charts charts-data new-charts-data)
+          (transition-charts charts-data new-charts-data fading?)
           (recur new-charts-data))))))
 
 (defn run []

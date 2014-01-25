@@ -8,13 +8,10 @@
   (let [rows (:raw-data chart)
         columns (:columns chart)
         data (js/google.visualization.DataTable.)]
-    ;(.log js/console (str "data for chart" chart))
     (.addColumn data "datetime" "Time")
     (doseq [column columns]
-      ;(.log js/console column)
       (.addColumn data "number" column))
     (doseq [[t row] (:raw-data chart)]
-      ;(.log js/console (str "row " t row))
       (let [vs (map #(get row %) columns)
             data-row (conj vs t)]
         (.addRow data (clj->js data-row))))
@@ -25,11 +22,9 @@
     (clj->js options)))
 
 (defn get-chart [selector]
-  #_(.log js/console (str "container" selector))
   (js/google.visualization.LineChart. (.get ($ selector) 0)))
 
 (.load js/google "visualization" "1" (clj->js {:packages ["corechart"]}))
-#_(.setOnLoadCallback js/google #(my-get "test.json"))
 
 (defn draw-chart [charts-data]
   (let [visible-chart-id (:visible charts-data)
@@ -43,5 +38,5 @@
 (defn fade-out-chart [charts-data onfinish]
   (fade-out ($ (:container-selector charts-data)) 400 onfinish))
 
-(defn fade-in-chart [charts-data]
-  (fade-in ($ (:container-selector charts-data)) 400 #()))
+(defn fade-in-chart [charts-data onfinish]
+  (fade-in ($ (:container-selector charts-data)) 1000 onfinish))
