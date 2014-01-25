@@ -15,29 +15,26 @@ Cljs chart plugin that continuously query multiple sources, and display each sou
 
 #### call in cljs
 ```clj
-(let [options {:container "mydiv"
-               :width 600
-               :height 200
-               :transition-interval 20
-               :query-interval 60
-               :default-display {:range 30 
-                                 :unit :minutes}}
-      data-sources [{:title "Stock A last 30 minutes"
-                     :url "get_price.json?stock=A"}
-                    {:title "Stock B last 30 minutes"
-                     :url "get_price.json?stock=B"}
-                    {:title "Stock C last 30 minutes"
-                     :url "get_price.json?stock=C"}
-                    {:title "Unrealized profit last 30 days"
+(let [options {:container-selector "#mydiv"
+               :gchart-options {:width 600 
+                                :height 200}
+               :query-interval 60*000
+               :display 30*60*1000}
+      data-sources [{:title "Stock A (last 30 minutes)"
+                     :url "get_price.json?stock=A"
+                     :columns ["volume" "price"]}
+                    {:title "Stock B (last 30 minutes)"
+                     :url "get_price.json?stock=B"
+                     :columns ["volume" "price"]}
+                    {:title "Performance (last 30 days)"
                      :url "get_profit.json"
-                     :display {:range 30
-                               :unit :days}}]]
-  (realtime-chart.core/build-charts (clj->js options) 
-                                    (clj->js data-sources)))
+                     :display 30*24*60*60*1000
+                     :columns ["revenue" "cost" "profit"]}
+  (realtime-chart.core/build-charts options data-sources))
 ```
 #### or call in js
 ```js
-realtime_chart.core.build_charts(options, data_sources);
+realtime_chart.core.build_charts_from_js(options, data_sources);
 ```
 
 ## Development
@@ -53,8 +50,9 @@ connect to brepl with the following code
 ```
 
 ## TODO
-* if we were to represent the state of chart data as state of modal in http://rigsomelight.com/2013/07/18/clojurescript-core-async-todos.html, the state can contain data from all sources, and only one source will be visible at a given moment. furthermore, one async channel can trigger the moving visibility from one source to another, and another channel that requests data from server
-* working prototype
+* ~~~if we were to represent the state of chart data as state of modal in http://rigsomelight.com/2013/07/18/clojurescript-core-async-todos.html, the state can contain data from all sources, and only one source will be visible at a given moment. furthermore, one async channel can trigger the moving visibility from one source to another, and another channel that requests data from server~~~
+* ~~~working prototype~~~
+* call build_chart_from_js function in js
 * cljs tests
 * make it into a library so other cljs can use it
 

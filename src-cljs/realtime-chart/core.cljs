@@ -110,6 +110,9 @@
           (transition-charts charts-data new-charts-data fading?)
           (recur new-charts-data))))))
 
+(defn ^:export build-charts-from-js [options data-sources]
+  (build-charts (js->clj options) (js->clj data-sources)))
+
 (defn run []
   (let [options {:query-interval 1000
                  :container-selector "#mydiv"
