@@ -29,7 +29,7 @@
 (defn draw-chart [charts-data]
   (let [visible-chart-id (:visible charts-data)
         visible-chart (get-in charts-data [:charts visible-chart-id])
-        chart (get-chart (:container-selector charts-data))
+        chart (:chart charts-data)
         options (chart-options (:gchart-options charts-data) 
                                (:gchart-options visible-chart))
         data (add-rows visible-chart)]

@@ -16,10 +16,10 @@
         receiver (fn [e]
                    (let [response (.-target e)
                          text (.getResponseText response)
-                         data (map 
+                         data (doall (map 
                                 (fn [[t v]]
                                   [(js/Date. (js/parseInt t)) v])
-                                (js->clj (JSON/parse text)))]
+                                (js->clj (JSON/parse text))))]
                      (put! rc [:new-data source-id data])))
         query (fn q []
                 (xhr/send url receiver "GET")
@@ -93,11 +93,12 @@
 (defn build-charts [options data-sources]
   (let [charts-data (conj options
                           [:visible 0]
-                          [:charts data-sources])
-        data-chans (for [source-id (range (count data-sources))
+                          [:charts data-sources]
+                          [:chart (c/get-chart (:container-selector options))])
+        data-chans (doall (for [source-id (range (count data-sources))
                          :let [data-source (get data-sources source-id)
                                url (:url data-source)]]
-                     (data-chan source-id url (:query-interval options)))
+                     (data-chan source-id url (:query-interval options))))
         transition-chan (transition-chan (:interval charts-data) 0 (count data-sources))
         all-chans (conj data-chans transition-chan)
         fading? (atom false)]
@@ -108,7 +109,7 @@
                                 (update-charts-data charts-data source-id data)
                                 (assoc charts-data :visible source-id))]
           (transition-charts charts-data new-charts-data fading?)
-          (recur new-charts-data))))))
+          (recur (doall new-charts-data)))))))
 
 (defn ^:export build-charts-from-js [options data-sources]
   (build-charts (js->clj options) (js->clj data-sources)))

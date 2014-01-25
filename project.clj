@@ -12,8 +12,8 @@
   :cljsbuild { 
     :builds [{:source-paths ["src-cljs"]
               :compiler {:output-to "resources/public/js/realtime-chart.js"
-                         ;:optimizations :whitespace
-                         :optimizations :advanced
+                         :optimizations :whitespace
+                         ;:optimizations :advanced
                          :externs ["externs/jquery-1.9.js"
                                    "externs/google_visualization_api.js"
                                    "externs/google_loader_api.js"]
