@@ -113,6 +113,7 @@
           (recur (doall new-charts-data)))))))
 
 (defn ^:export build-charts-from-js [options data-sources]
-  (build-charts (keywordize-keys (js->clj options)) 
-                (keywordize-keys (js->clj data-sources))))
+  (let [options (keywordize-keys (js->clj options))
+        data-sources (keywordize-keys (js->clj data-sources))]
+  (build-charts options data-sources)))
 
