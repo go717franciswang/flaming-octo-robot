@@ -30,13 +30,13 @@
   (let [visible-chart-id (:visible charts-data)
         visible-chart (get-in charts-data [:charts visible-chart-id])
         chart (:chart charts-data)
-        options (chart-options (:gchart-options charts-data) 
-                               (:gchart-options visible-chart))
+        options (chart-options (:gchartOptions charts-data) 
+                               (:gchartOptions visible-chart))
         data (add-rows visible-chart)]
     (.draw chart data options)))
 
 (defn fade-out-chart [charts-data onfinish]
-  (fade-out ($ (:container-selector charts-data)) 400 onfinish))
+  (fade-out ($ (:containerSelector charts-data)) 400 onfinish))
 
 (defn fade-in-chart [charts-data onfinish]
-  (fade-in ($ (:container-selector charts-data)) 1000 onfinish))
+  (fade-in ($ (:containerSelector charts-data)) 1000 onfinish))

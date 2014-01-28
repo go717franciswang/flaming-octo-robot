@@ -4,6 +4,55 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="https://www.google.com/jsapi"></script>
   <script src="js/realtime-chart.js"></script>
+  <script>
+  chart1 = function() {
+    var options = {queryInterval: 1000,
+                   containerSelector: "#mydiv",
+                   gchartOptions: {curveType: "function",
+                                   width: 800,
+                                   height: 300},
+                   display: 60000};
+    var data_sources = [{gchartOptions: {title: "Memory Usage (60 sec window)"},
+                         url: "freemem.php",
+                         columns: ["free mem"]}];
+    realtime_chart.core.build_charts_from_js(options, data_sources);
+  };
+
+  chart2 = function() {
+    var options = {queryInterval: 1000,
+                   containerSelector: "#mydiv2",
+                   gchartOptions: {curveType: "function",
+                                   width: 800,
+                                   height: 300},
+                   display: 30000};
+    var data_sources = [{gchartOptions: {title: "Memory Usage (30 sec window)"},
+                         url: "freemem.php",
+                         columns: ["free mem", "cached"]}];
+    realtime_chart.core.build_charts_from_js(options, data_sources);
+  };
+
+  chart3 = function() {
+    var options = {queryInterval: 1000,
+                   containerSelector: "#mydiv3",
+                   gchartOptions: {curveType: "function",
+                                   width: 800,
+                                   height: 300},
+                   display: 60000};
+    var data_sources = [{gchartOptions: {title: "Memory Usage (60 sec window)"},
+                         url: "freemem.php",
+                         columns: ["free mem"]},
+                        {gchartOptions: {title: "Memory Usage (30 sec window)"},
+                         url: "freemem.php",
+                         display: 30000,
+                         columns: ["free mem", "cached"]}];
+    realtime_chart.core.build_charts_from_js(options, data_sources);
+  };
+
+  google.setOnLoadCallback(chart1);
+  google.setOnLoadCallback(chart2);
+  google.setOnLoadCallback(chart3);
+
+  </script>
 </head>
 <body>
   <div id="mydiv">

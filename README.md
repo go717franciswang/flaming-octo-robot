@@ -15,10 +15,10 @@ Cljs chart plugin that continuously query multiple sources, and display each sou
 
 #### call in cljs
 ```clj
-(let [options {:container-selector "#mydiv"
-               :gchart-options {:width 600 
+(let [options {:containerSelector "#mydiv"
+               :gchartOptions {:width 600 
                                 :height 200}
-               :query-interval 60*000
+               :queryInterval 60*000
                :display 30*60*1000}
       data-sources [{:title "Stock A (last 30 minutes)"
                      :url "get_price.json?stock=A"
@@ -52,10 +52,10 @@ connect to brepl with the following code
 ## TODO
 - [x] if we were to represent the state of chart data as state of modal in http://rigsomelight.com/2013/07/18/clojurescript-core-async-todos.html, the state can contain data from all sources, and only one source will be visible at a given moment. furthermore, one async channel can trigger the moving visibility from one source to another, and another channel that requests data from server
 - [x] working prototype
-- [ ] reduce the memory usage, it should stabilize instead of constantly rising
-- [ ] call ```build_chart_from_js``` function in js
+- [x] reduce the memory usage, it should stabilize instead of constantly rising
+- [x] call ```build_charts_from_js``` function in js
 - [ ] cljs tests
-- [ ] make it into a library so other cljs can use it
+- [?] make it into a library so other cljs can use it
 
 ## License
 
