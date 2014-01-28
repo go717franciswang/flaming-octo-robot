@@ -57,13 +57,6 @@
         latest-chart-data (filter-old-data new-chart-data oldest-timestamp)]
     (assoc-in charts-data [:charts source-id :raw-data] latest-chart-data)))
 
-(defn wait-for [target input-chan]
-  (loop []
-    (go (let [msg (<! input-chan)]
-          (if (= msg target)
-            msg
-            (recur))))))
-
 (defn transition-charts [old-charts-data new-charts-data fading?]
   (when (not @fading?)
     (if (not= (:visible old-charts-data) (:visible new-charts-data))
