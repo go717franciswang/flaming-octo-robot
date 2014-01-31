@@ -60,7 +60,6 @@ view demo at resources/public/index.html
 - [x] reduce the memory usage, it should stabilize instead of constantly rising
 - [x] call ```build_charts_from_js``` function in js
 - [x] cljs tests
-- [ ] gchartOptions that contain dot do not appear to work, need to fix
 - [?] make it into a library so other cljs can use it
 
 ## License
