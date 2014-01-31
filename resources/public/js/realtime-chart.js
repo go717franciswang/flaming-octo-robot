@@ -44635,10 +44635,10 @@ realtime_chart.core.data_chan = function data_chan(source_id, url, interval) {
       var response = e.target;
       var text = response.getResponseText();
       var data = cljs.core.doall.call(null, cljs.core.map.call(null, function(response, text, rc) {
-        return function(p__8674) {
-          var vec__8675 = p__8674;
-          var t = cljs.core.nth.call(null, vec__8675, 0, null);
-          var v = cljs.core.nth.call(null, vec__8675, 1, null);
+        return function(p__8624) {
+          var vec__8625 = p__8624;
+          var t = cljs.core.nth.call(null, vec__8625, 0, null);
+          var v = cljs.core.nth.call(null, vec__8625, 1, null);
           return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new Date(parseInt(t)), v], null);
         };
       }(response, text, rc), cljs.core.js__GT_clj.call(null, JSON.parse.call(null, text))));
@@ -44695,18 +44695,22 @@ realtime_chart.core.get_oldest_timestamp = function get_oldest_timestamp(default
   return oldest_timestamp;
 };
 realtime_chart.core.filter_old_data = function filter_old_data(chart_data, oldest_timestamp) {
-  var outdated = cljs.core.seq.call(null, cljs.core.take_while.call(null, function(p1__8676_SHARP_) {
-    return p1__8676_SHARP_.getTime() < oldest_timestamp;
+  var outdated = cljs.core.seq.call(null, cljs.core.take_while.call(null, function(p1__8626_SHARP_) {
+    return p1__8626_SHARP_.getTime() < oldest_timestamp;
   }, cljs.core.keys.call(null, chart_data)));
   return cljs.core.apply.call(null, cljs.core.dissoc, chart_data, outdated);
 };
 realtime_chart.core.update_charts_data = function update_charts_data(charts_data, source_id, raw_data) {
-  var chart = cljs.core.get_in.call(null, charts_data, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "charts", "charts", 3947239367), source_id], null));
-  var chart_data = cljs.core.get.call(null, chart, new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081), cljs.core.sorted_map.call(null));
-  var new_chart_data = cljs.core.into.call(null, chart_data, raw_data);
-  var oldest_timestamp = realtime_chart.core.get_oldest_timestamp.call(null, (new cljs.core.Keyword(null, "display", "display", 2685668404)).cljs$core$IFn$_invoke$arity$1(charts_data), (new cljs.core.Keyword(null, "display", "display", 2685668404)).cljs$core$IFn$_invoke$arity$1(chart), new_chart_data);
-  var latest_chart_data = realtime_chart.core.filter_old_data.call(null, new_chart_data, oldest_timestamp);
-  return cljs.core.assoc_in.call(null, charts_data, new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "charts", "charts", 3947239367), source_id, new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081)], null), latest_chart_data);
+  if (!cljs.core.empty_QMARK_.call(null, raw_data)) {
+    var chart = cljs.core.get_in.call(null, charts_data, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "charts", "charts", 3947239367), source_id], null));
+    var chart_data = cljs.core.get.call(null, chart, new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081), cljs.core.sorted_map.call(null));
+    var new_chart_data = cljs.core.into.call(null, chart_data, raw_data);
+    var oldest_timestamp = realtime_chart.core.get_oldest_timestamp.call(null, (new cljs.core.Keyword(null, "display", "display", 2685668404)).cljs$core$IFn$_invoke$arity$1(charts_data), (new cljs.core.Keyword(null, "display", "display", 2685668404)).cljs$core$IFn$_invoke$arity$1(chart), new_chart_data);
+    var latest_chart_data = realtime_chart.core.filter_old_data.call(null, new_chart_data, oldest_timestamp);
+    return cljs.core.assoc_in.call(null, charts_data, new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "charts", "charts", 3947239367), source_id, new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081)], null), latest_chart_data);
+  } else {
+    return charts_data;
+  }
 };
 realtime_chart.core.transition_charts = function transition_charts(old_charts_data, new_charts_data, fading_QMARK_) {
   if (cljs.core.not.call(null, cljs.core.deref.call(null, fading_QMARK_))) {
@@ -44734,28 +44738,28 @@ realtime_chart.core.build_charts = function build_charts(options, data_sources) 
   1108527952), realtime_chart.chart.get_chart.call(null, (new cljs.core.Keyword(null, "containerSelector", "containerSelector", 1698727666)).cljs$core$IFn$_invoke$arity$1(options))], null));
   var data_chans = cljs.core.doall.call(null, function() {
     var iter__4119__auto__ = function(charts_data) {
-      return function iter__8723(s__8724) {
+      return function iter__8673(s__8674) {
         return new cljs.core.LazySeq(null, function(charts_data) {
           return function() {
-            var s__8724__$1 = s__8724;
+            var s__8674__$1 = s__8674;
             while (true) {
-              var temp__4092__auto__ = cljs.core.seq.call(null, s__8724__$1);
+              var temp__4092__auto__ = cljs.core.seq.call(null, s__8674__$1);
               if (temp__4092__auto__) {
-                var s__8724__$2 = temp__4092__auto__;
-                if (cljs.core.chunked_seq_QMARK_.call(null, s__8724__$2)) {
-                  var c__4117__auto__ = cljs.core.chunk_first.call(null, s__8724__$2);
+                var s__8674__$2 = temp__4092__auto__;
+                if (cljs.core.chunked_seq_QMARK_.call(null, s__8674__$2)) {
+                  var c__4117__auto__ = cljs.core.chunk_first.call(null, s__8674__$2);
                   var size__4118__auto__ = cljs.core.count.call(null, c__4117__auto__);
-                  var b__8726 = cljs.core.chunk_buffer.call(null, size__4118__auto__);
+                  var b__8676 = cljs.core.chunk_buffer.call(null, size__4118__auto__);
                   if (function() {
-                    var i__8725 = 0;
+                    var i__8675 = 0;
                     while (true) {
-                      if (i__8725 < size__4118__auto__) {
-                        var source_id = cljs.core._nth.call(null, c__4117__auto__, i__8725);
+                      if (i__8675 < size__4118__auto__) {
+                        var source_id = cljs.core._nth.call(null, c__4117__auto__, i__8675);
                         var data_source = cljs.core.get.call(null, data_sources, source_id);
                         var url = (new cljs.core.Keyword(null, "url", "url", 1014020321)).cljs$core$IFn$_invoke$arity$1(data_source);
-                        cljs.core.chunk_append.call(null, b__8726, realtime_chart.core.data_chan.call(null, source_id, url, (new cljs.core.Keyword(null, "queryInterval", "queryInterval", 3382119711)).cljs$core$IFn$_invoke$arity$1(options)));
-                        var G__8769 = i__8725 + 1;
-                        i__8725 = G__8769;
+                        cljs.core.chunk_append.call(null, b__8676, realtime_chart.core.data_chan.call(null, source_id, url, (new cljs.core.Keyword(null, "queryInterval", "queryInterval", 3382119711)).cljs$core$IFn$_invoke$arity$1(options)));
+                        var G__8719 = i__8675 + 1;
+                        i__8675 = G__8719;
                         continue;
                       } else {
                         return true;
@@ -44763,15 +44767,15 @@ realtime_chart.core.build_charts = function build_charts(options, data_sources) 
                       break;
                     }
                   }()) {
-                    return cljs.core.chunk_cons.call(null, cljs.core.chunk.call(null, b__8726), iter__8723.call(null, cljs.core.chunk_rest.call(null, s__8724__$2)));
+                    return cljs.core.chunk_cons.call(null, cljs.core.chunk.call(null, b__8676), iter__8673.call(null, cljs.core.chunk_rest.call(null, s__8674__$2)));
                   } else {
-                    return cljs.core.chunk_cons.call(null, cljs.core.chunk.call(null, b__8726), null);
+                    return cljs.core.chunk_cons.call(null, cljs.core.chunk.call(null, b__8676), null);
                   }
                 } else {
-                  var source_id = cljs.core.first.call(null, s__8724__$2);
+                  var source_id = cljs.core.first.call(null, s__8674__$2);
                   var data_source = cljs.core.get.call(null, data_sources, source_id);
                   var url = (new cljs.core.Keyword(null, "url", "url", 1014020321)).cljs$core$IFn$_invoke$arity$1(data_source);
-                  return cljs.core.cons.call(null, realtime_chart.core.data_chan.call(null, source_id, url, (new cljs.core.Keyword(null, "queryInterval", "queryInterval", 3382119711)).cljs$core$IFn$_invoke$arity$1(options)), iter__8723.call(null, cljs.core.rest.call(null, s__8724__$2)));
+                  return cljs.core.cons.call(null, realtime_chart.core.data_chan.call(null, source_id, url, (new cljs.core.Keyword(null, "queryInterval", "queryInterval", 3382119711)).cljs$core$IFn$_invoke$arity$1(options)), iter__8673.call(null, cljs.core.rest.call(null, s__8674__$2)));
                 }
               } else {
                 return null;
@@ -44787,92 +44791,92 @@ realtime_chart.core.build_charts = function build_charts(options, data_sources) 
   var transition_chan = realtime_chart.core.transition_chan.call(null, (new cljs.core.Keyword(null, "interval", "interval", 1584322615)).cljs$core$IFn$_invoke$arity$1(charts_data), 0, cljs.core.count.call(null, data_sources));
   var all_chans = cljs.core.conj.call(null, data_chans, transition_chan);
   var fading_QMARK_ = cljs.core.atom.call(null, false);
-  var c__6271__auto__ = cljs.core.async.chan.call(null, 1);
+  var c__6221__auto__ = cljs.core.async.chan.call(null, 1);
   cljs.core.async.impl.dispatch.run.call(null, function() {
-    var f__6272__auto__ = function() {
-      var switch__6256__auto__ = function(state_8751) {
-        var state_val_8752 = state_8751[1];
-        if (state_val_8752 === 7) {
-          var inst_8727 = state_8751[7];
-          var inst_8744 = state_8751[2];
-          var inst_8745 = realtime_chart.core.transition_charts.call(null, inst_8727, inst_8744, fading_QMARK_);
-          var inst_8746 = cljs.core.doall.call(null, inst_8744);
-          var inst_8727__$1 = inst_8746;
-          var state_8751__$1 = function() {
-            var statearr_8753 = state_8751;
-            statearr_8753[8] = inst_8745;
-            statearr_8753[7] = inst_8727__$1;
-            return statearr_8753;
+    var f__6222__auto__ = function() {
+      var switch__6206__auto__ = function(state_8701) {
+        var state_val_8702 = state_8701[1];
+        if (state_val_8702 === 7) {
+          var inst_8677 = state_8701[7];
+          var inst_8694 = state_8701[2];
+          var inst_8695 = realtime_chart.core.transition_charts.call(null, inst_8677, inst_8694, fading_QMARK_);
+          var inst_8696 = cljs.core.doall.call(null, inst_8694);
+          var inst_8677__$1 = inst_8696;
+          var state_8701__$1 = function() {
+            var statearr_8703 = state_8701;
+            statearr_8703[8] = inst_8695;
+            statearr_8703[7] = inst_8677__$1;
+            return statearr_8703;
           }();
-          var statearr_8754_8770 = state_8751__$1;
-          statearr_8754_8770[2] = null;
-          statearr_8754_8770[1] = 2;
+          var statearr_8704_8720 = state_8701__$1;
+          statearr_8704_8720[2] = null;
+          statearr_8704_8720[1] = 2;
           return new cljs.core.Keyword(null, "recur", "recur", 1122293407);
         } else {
-          if (state_val_8752 === 6) {
-            var inst_8727 = state_8751[7];
-            var inst_8735 = state_8751[9];
-            var inst_8742 = cljs.core.assoc.call(null, inst_8727, new cljs.core.Keyword(null, "visible", "visible", 1480647652), inst_8735);
-            var state_8751__$1 = state_8751;
-            var statearr_8755_8771 = state_8751__$1;
-            statearr_8755_8771[2] = inst_8742;
-            statearr_8755_8771[1] = 7;
+          if (state_val_8702 === 6) {
+            var inst_8677 = state_8701[7];
+            var inst_8685 = state_8701[9];
+            var inst_8692 = cljs.core.assoc.call(null, inst_8677, new cljs.core.Keyword(null, "visible", "visible", 1480647652), inst_8685);
+            var state_8701__$1 = state_8701;
+            var statearr_8705_8721 = state_8701__$1;
+            statearr_8705_8721[2] = inst_8692;
+            statearr_8705_8721[1] = 7;
             return new cljs.core.Keyword(null, "recur", "recur", 1122293407);
           } else {
-            if (state_val_8752 === 5) {
-              var inst_8736 = state_8751[10];
-              var inst_8727 = state_8751[7];
-              var inst_8735 = state_8751[9];
-              var inst_8740 = realtime_chart.core.update_charts_data.call(null, inst_8727, inst_8735, inst_8736);
-              var state_8751__$1 = state_8751;
-              var statearr_8756_8772 = state_8751__$1;
-              statearr_8756_8772[2] = inst_8740;
-              statearr_8756_8772[1] = 7;
+            if (state_val_8702 === 5) {
+              var inst_8677 = state_8701[7];
+              var inst_8685 = state_8701[9];
+              var inst_8686 = state_8701[10];
+              var inst_8690 = realtime_chart.core.update_charts_data.call(null, inst_8677, inst_8685, inst_8686);
+              var state_8701__$1 = state_8701;
+              var statearr_8706_8722 = state_8701__$1;
+              statearr_8706_8722[2] = inst_8690;
+              statearr_8706_8722[1] = 7;
               return new cljs.core.Keyword(null, "recur", "recur", 1122293407);
             } else {
-              if (state_val_8752 === 4) {
-                var inst_8732 = state_8751[2];
-                var inst_8733 = cljs.core.nth.call(null, inst_8732, 0, null);
-                var inst_8734 = cljs.core.nth.call(null, inst_8733, 0, null);
-                var inst_8735 = cljs.core.nth.call(null, inst_8733, 1, null);
-                var inst_8736 = cljs.core.nth.call(null, inst_8733, 2, null);
-                var inst_8737 = cljs.core.nth.call(null, inst_8732, 1, null);
-                var inst_8738 = cljs.core._EQ_.call(null, inst_8734, new cljs.core.Keyword(null, "new-data", "new-data", 2344574761));
-                var state_8751__$1 = function() {
-                  var statearr_8757 = state_8751;
-                  statearr_8757[11] = inst_8737;
-                  statearr_8757[10] = inst_8736;
-                  statearr_8757[9] = inst_8735;
-                  return statearr_8757;
+              if (state_val_8702 === 4) {
+                var inst_8682 = state_8701[2];
+                var inst_8683 = cljs.core.nth.call(null, inst_8682, 0, null);
+                var inst_8684 = cljs.core.nth.call(null, inst_8683, 0, null);
+                var inst_8685 = cljs.core.nth.call(null, inst_8683, 1, null);
+                var inst_8686 = cljs.core.nth.call(null, inst_8683, 2, null);
+                var inst_8687 = cljs.core.nth.call(null, inst_8682, 1, null);
+                var inst_8688 = cljs.core._EQ_.call(null, inst_8684, new cljs.core.Keyword(null, "new-data", "new-data", 2344574761));
+                var state_8701__$1 = function() {
+                  var statearr_8707 = state_8701;
+                  statearr_8707[11] = inst_8687;
+                  statearr_8707[9] = inst_8685;
+                  statearr_8707[10] = inst_8686;
+                  return statearr_8707;
                 }();
-                if (inst_8738) {
-                  var statearr_8758_8773 = state_8751__$1;
-                  statearr_8758_8773[1] = 5;
+                if (inst_8688) {
+                  var statearr_8708_8723 = state_8701__$1;
+                  statearr_8708_8723[1] = 5;
                 } else {
-                  var statearr_8759_8774 = state_8751__$1;
-                  statearr_8759_8774[1] = 6;
+                  var statearr_8709_8724 = state_8701__$1;
+                  statearr_8709_8724[1] = 6;
                 }
                 return new cljs.core.Keyword(null, "recur", "recur", 1122293407);
               } else {
-                if (state_val_8752 === 3) {
-                  var inst_8749 = state_8751[2];
-                  var state_8751__$1 = state_8751;
-                  return cljs.core.async.impl.ioc_helpers.return_chan.call(null, state_8751__$1, inst_8749);
+                if (state_val_8702 === 3) {
+                  var inst_8699 = state_8701[2];
+                  var state_8701__$1 = state_8701;
+                  return cljs.core.async.impl.ioc_helpers.return_chan.call(null, state_8701__$1, inst_8699);
                 } else {
-                  if (state_val_8752 === 2) {
-                    var state_8751__$1 = state_8751;
-                    return cljs.core.async.impl.ioc_helpers.ioc_alts_BANG_.call(null, state_8751__$1, 4, all_chans);
+                  if (state_val_8702 === 2) {
+                    var state_8701__$1 = state_8701;
+                    return cljs.core.async.impl.ioc_helpers.ioc_alts_BANG_.call(null, state_8701__$1, 4, all_chans);
                   } else {
-                    if (state_val_8752 === 1) {
-                      var inst_8727 = charts_data;
-                      var state_8751__$1 = function() {
-                        var statearr_8760 = state_8751;
-                        statearr_8760[7] = inst_8727;
-                        return statearr_8760;
+                    if (state_val_8702 === 1) {
+                      var inst_8677 = charts_data;
+                      var state_8701__$1 = function() {
+                        var statearr_8710 = state_8701;
+                        statearr_8710[7] = inst_8677;
+                        return statearr_8710;
                       }();
-                      var statearr_8761_8775 = state_8751__$1;
-                      statearr_8761_8775[2] = null;
-                      statearr_8761_8775[1] = 2;
+                      var statearr_8711_8725 = state_8701__$1;
+                      statearr_8711_8725[2] = null;
+                      statearr_8711_8725[1] = 2;
                       return new cljs.core.Keyword(null, "recur", "recur", 1122293407);
                     } else {
                       return null;
@@ -44884,77 +44888,77 @@ realtime_chart.core.build_charts = function build_charts(options, data_sources) 
           }
         }
       };
-      return function(switch__6256__auto__) {
+      return function(switch__6206__auto__) {
         return function() {
-          var state_machine__6257__auto__ = null;
-          var state_machine__6257__auto____0 = function() {
-            var statearr_8765 = [null, null, null, null, null, null, null, null, null, null, null, null];
-            statearr_8765[0] = state_machine__6257__auto__;
-            statearr_8765[1] = 1;
-            return statearr_8765;
+          var state_machine__6207__auto__ = null;
+          var state_machine__6207__auto____0 = function() {
+            var statearr_8715 = [null, null, null, null, null, null, null, null, null, null, null, null];
+            statearr_8715[0] = state_machine__6207__auto__;
+            statearr_8715[1] = 1;
+            return statearr_8715;
           };
-          var state_machine__6257__auto____1 = function(state_8751) {
+          var state_machine__6207__auto____1 = function(state_8701) {
             while (true) {
-              var ret_value__6258__auto__ = function() {
+              var ret_value__6208__auto__ = function() {
                 try {
                   while (true) {
-                    var result__6259__auto__ = switch__6256__auto__.call(null, state_8751);
-                    if (cljs.core.keyword_identical_QMARK_.call(null, result__6259__auto__, new cljs.core.Keyword(null, "recur", "recur", 1122293407))) {
+                    var result__6209__auto__ = switch__6206__auto__.call(null, state_8701);
+                    if (cljs.core.keyword_identical_QMARK_.call(null, result__6209__auto__, new cljs.core.Keyword(null, "recur", "recur", 1122293407))) {
                       continue;
                     } else {
-                      return result__6259__auto__;
+                      return result__6209__auto__;
                     }
                     break;
                   }
-                } catch (e8766) {
-                  if (e8766 instanceof Object) {
-                    var ex__6260__auto__ = e8766;
-                    var statearr_8767_8776 = state_8751;
-                    statearr_8767_8776[5] = ex__6260__auto__;
-                    cljs.core.async.impl.ioc_helpers.process_exception.call(null, state_8751);
+                } catch (e8716) {
+                  if (e8716 instanceof Object) {
+                    var ex__6210__auto__ = e8716;
+                    var statearr_8717_8726 = state_8701;
+                    statearr_8717_8726[5] = ex__6210__auto__;
+                    cljs.core.async.impl.ioc_helpers.process_exception.call(null, state_8701);
                     return new cljs.core.Keyword(null, "recur", "recur", 1122293407);
                   } else {
                     if (new cljs.core.Keyword(null, "else", "else", 1017020587)) {
-                      throw e8766;
+                      throw e8716;
                     } else {
                       return null;
                     }
                   }
                 }
               }();
-              if (cljs.core.keyword_identical_QMARK_.call(null, ret_value__6258__auto__, new cljs.core.Keyword(null, "recur", "recur", 1122293407))) {
-                var G__8777 = state_8751;
-                state_8751 = G__8777;
+              if (cljs.core.keyword_identical_QMARK_.call(null, ret_value__6208__auto__, new cljs.core.Keyword(null, "recur", "recur", 1122293407))) {
+                var G__8727 = state_8701;
+                state_8701 = G__8727;
                 continue;
               } else {
-                return ret_value__6258__auto__;
+                return ret_value__6208__auto__;
               }
               break;
             }
           };
-          state_machine__6257__auto__ = function(state_8751) {
+          state_machine__6207__auto__ = function(state_8701) {
             switch(arguments.length) {
               case 0:
-                return state_machine__6257__auto____0.call(this);
+                return state_machine__6207__auto____0.call(this);
               case 1:
-                return state_machine__6257__auto____1.call(this, state_8751);
+                return state_machine__6207__auto____1.call(this, state_8701);
             }
             throw new Error("Invalid arity: " + arguments.length);
           };
-          state_machine__6257__auto__.cljs$core$IFn$_invoke$arity$0 = state_machine__6257__auto____0;
-          state_machine__6257__auto__.cljs$core$IFn$_invoke$arity$1 = state_machine__6257__auto____1;
-          return state_machine__6257__auto__;
+          state_machine__6207__auto__.cljs$core$IFn$_invoke$arity$0 = state_machine__6207__auto____0;
+          state_machine__6207__auto__.cljs$core$IFn$_invoke$arity$1 = state_machine__6207__auto____1;
+          return state_machine__6207__auto__;
         }();
-      }(switch__6256__auto__);
+      }(switch__6206__auto__);
     }();
-    var state__6273__auto__ = function() {
-      var statearr_8768 = f__6272__auto__.call(null);
-      statearr_8768[cljs.core.async.impl.ioc_helpers.USER_START_IDX] = c__6271__auto__;
-      return statearr_8768;
+    var state__6223__auto__ = function() {
+      var statearr_8718 = f__6222__auto__.call(null);
+      statearr_8718[cljs.core.async.impl.ioc_helpers.USER_START_IDX] = c__6221__auto__;
+      return statearr_8718;
     }();
-    return cljs.core.async.impl.ioc_helpers.run_state_machine_wrapped.call(null, state__6273__auto__);
+    return cljs.core.async.impl.ioc_helpers.run_state_machine_wrapped.call(null, state__6223__auto__);
   });
-  return c__6271__auto__;
+  return c__6221__auto__;
 };
 realtime_chart.core.build_charts_from_js = function build_charts_from_js(options, data_sources) {
   var options__$1 = clojure.walk.keywordize_keys.call(null, cljs.core.js__GT_clj.call(null, options));
@@ -45393,76 +45397,76 @@ realtime_chart.core_test.data_manipulation = function data_manipulation() {
   return cemerick.cljs.test.test_function.call(null, realtime_chart.core_test.data_manipulation);
 };
 realtime_chart.core_test.data_manipulation = cljs.core.vary_meta.call(null, realtime_chart.core_test.data_manipulation, cljs.core.assoc, new cljs.core.Keyword(null, "name", "name", 1017277949), new cljs.core.Symbol(null, "data-manipulation", "data-manipulation", -1462399335, null), new cljs.core.Keyword(null, "test", "test", 1017460740), function data_manipulation_test() {
-  var _STAR_testing_contexts_STAR_8934_8938 = cemerick.cljs.test._STAR_testing_contexts_STAR_;
+  var _STAR_testing_contexts_STAR_8884_8888 = cemerick.cljs.test._STAR_testing_contexts_STAR_;
   try {
     cemerick.cljs.test._STAR_testing_contexts_STAR_ = cljs.core.conj.call(null, cemerick.cljs.test._STAR_testing_contexts_STAR_, "filter-old-data");
-    var chart_data_8939 = new cljs.core.PersistentArrayMap.fromArray([new Date(1390940275E3), new cljs.core.Keyword(null, "a", "a", 1013904339), new Date(1390940277E3), new cljs.core.Keyword(null, "b", "b", 1013904340)], true, false);
+    var chart_data_8889 = new cljs.core.PersistentArrayMap.fromArray([new Date(1390940275E3), new cljs.core.Keyword(null, "a", "a", 1013904339), new Date(1390940277E3), new cljs.core.Keyword(null, "b", "b", 1013904340)], true, false);
     try {
-      var values__8799__auto___8940 = cljs.core._conj.call(null, cljs.core._conj.call(null, cljs.core.List.EMPTY, realtime_chart.core.filter_old_data.call(null, chart_data_8939, 1390940276E3)), new cljs.core.PersistentArrayMap.fromArray([new Date(1390940277E3), new cljs.core.Keyword(null, "b", "b", 1013904340)], true, false));
-      var result__8800__auto___8941 = cljs.core.apply.call(null, cljs.core._EQ_, values__8799__auto___8940);
-      if (cljs.core.truth_(result__8800__auto___8941)) {
-        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), cljs.core.cons.call(null, cljs.core._EQ_, values__8799__auto___8940), new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "pass", "pass", 1017337731), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, 
+      var values__8749__auto___8890 = cljs.core._conj.call(null, cljs.core._conj.call(null, cljs.core.List.EMPTY, realtime_chart.core.filter_old_data.call(null, chart_data_8889, 1390940276E3)), new cljs.core.PersistentArrayMap.fromArray([new Date(1390940277E3), new cljs.core.Keyword(null, "b", "b", 1013904340)], true, false));
+      var result__8750__auto___8891 = cljs.core.apply.call(null, cljs.core._EQ_, values__8749__auto___8890);
+      if (cljs.core.truth_(result__8750__auto___8891)) {
+        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), cljs.core.cons.call(null, cljs.core._EQ_, values__8749__auto___8890), new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "pass", "pass", 1017337731), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, 
         "\x3d", "\x3d", -1640531466, null), new cljs.core.PersistentArrayMap.fromArray([cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940277E3), new cljs.core.Keyword(null, "b", "b", 1013904340)], true, false), cljs.core.list(new cljs.core.Symbol(null, "filter-old-data", "filter-old-data", -882328578, null), new cljs.core.Symbol(null, "chart-data", "chart-data", 98495986, null), 1390940276E3))], null));
       } else {
-        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), cljs.core._conj.call(null, cljs.core._conj.call(null, cljs.core.List.EMPTY, cljs.core.cons.call(null, new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), values__8799__auto___8940)), new cljs.core.Symbol(null, "not", "not", -1640422260, null)), new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "fail", 
+        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), cljs.core._conj.call(null, cljs.core._conj.call(null, cljs.core.List.EMPTY, cljs.core.cons.call(null, new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), values__8749__auto___8890)), new cljs.core.Symbol(null, "not", "not", -1640422260, null)), new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "fail", 
         "fail", 1017039504), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), new cljs.core.PersistentArrayMap.fromArray([cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940277E3), new cljs.core.Keyword(null, "b", "b", 1013904340)], true, false), cljs.core.list(new cljs.core.Symbol(null, "filter-old-data", 
         "filter-old-data", -882328578, null), new cljs.core.Symbol(null, "chart-data", "chart-data", 98495986, null), 1390940276E3))], null));
       }
-    } catch (e8935) {
-      if (e8935 instanceof Error) {
-        var t__8836__auto___8942 = e8935;
-        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), t__8836__auto___8942, new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "error", "error", 1110689146), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), 
+    } catch (e8885) {
+      if (e8885 instanceof Error) {
+        var t__8786__auto___8892 = e8885;
+        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), t__8786__auto___8892, new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "error", "error", 1110689146), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), 
         new cljs.core.PersistentArrayMap.fromArray([cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940277E3), new cljs.core.Keyword(null, "b", "b", 1013904340)], true, false), cljs.core.list(new cljs.core.Symbol(null, "filter-old-data", "filter-old-data", -882328578, null), new cljs.core.Symbol(null, "chart-data", "chart-data", 98495986, null), 1390940276E3))], null));
       } else {
         if (new cljs.core.Keyword(null, "else", "else", 1017020587)) {
-          throw e8935;
+          throw e8885;
         } else {
         }
       }
     }
   } finally {
-    cemerick.cljs.test._STAR_testing_contexts_STAR_ = _STAR_testing_contexts_STAR_8934_8938;
+    cemerick.cljs.test._STAR_testing_contexts_STAR_ = _STAR_testing_contexts_STAR_8884_8888;
   }
-  var _STAR_testing_contexts_STAR_8936 = cemerick.cljs.test._STAR_testing_contexts_STAR_;
+  var _STAR_testing_contexts_STAR_8886 = cemerick.cljs.test._STAR_testing_contexts_STAR_;
   try {
     cemerick.cljs.test._STAR_testing_contexts_STAR_ = cljs.core.conj.call(null, cemerick.cljs.test._STAR_testing_contexts_STAR_, "update-charts-data");
     var source_id = 0;
     var charts_data = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "display", "display", 2685668404), 1E6, new cljs.core.Keyword(null, "charts", "charts", 3947239367), new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081), new cljs.core.PersistentArrayMap.fromArray([new Date(1390940275E3), new cljs.core.Keyword(null, "a", "a", 1013904339), 
     new Date(1390940276E3), new cljs.core.Keyword(null, "b", "b", 1013904340), new Date(1390940277E3), new cljs.core.Keyword(null, "c", "c", 1013904341)], true, false)], null)], null)], null);
     try {
-      var values__8799__auto__ = cljs.core._conj.call(null, cljs.core._conj.call(null, cljs.core.List.EMPTY, (new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081)).cljs$core$IFn$_invoke$arity$1(cljs.core.first.call(null, (new cljs.core.Keyword(null, "charts", "charts", 3947239367)).cljs$core$IFn$_invoke$arity$1(realtime_chart.core.update_charts_data.call(null, charts_data, source_id, new cljs.core.PersistentArrayMap.fromArray([new Date(1390940275E3), new cljs.core.Keyword(null, "a-mod", 
+      var values__8749__auto__ = cljs.core._conj.call(null, cljs.core._conj.call(null, cljs.core.List.EMPTY, (new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081)).cljs$core$IFn$_invoke$arity$1(cljs.core.first.call(null, (new cljs.core.Keyword(null, "charts", "charts", 3947239367)).cljs$core$IFn$_invoke$arity$1(realtime_chart.core.update_charts_data.call(null, charts_data, source_id, new cljs.core.PersistentArrayMap.fromArray([new Date(1390940275E3), new cljs.core.Keyword(null, "a-mod", 
       "a-mod", 1104934664), new Date(1390940277E3), new cljs.core.Keyword(null, "c-mod", "c-mod", 1106781706)], true, false)))))), new cljs.core.PersistentArrayMap.fromArray([new Date(1390940275E3), new cljs.core.Keyword(null, "a-mod", "a-mod", 1104934664), new Date(1390940276E3), new cljs.core.Keyword(null, "b", "b", 1013904340), new Date(1390940277E3), new cljs.core.Keyword(null, "c-mod", "c-mod", 1106781706)], true, false));
-      var result__8800__auto__ = cljs.core.apply.call(null, cljs.core._EQ_, values__8799__auto__);
-      if (cljs.core.truth_(result__8800__auto__)) {
-        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), cljs.core.cons.call(null, cljs.core._EQ_, values__8799__auto__), new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "pass", "pass", 1017337731), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, 
+      var result__8750__auto__ = cljs.core.apply.call(null, cljs.core._EQ_, values__8749__auto__);
+      if (cljs.core.truth_(result__8750__auto__)) {
+        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), cljs.core.cons.call(null, cljs.core._EQ_, values__8749__auto__), new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "pass", "pass", 1017337731), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, 
         "\x3d", "\x3d", -1640531466, null), new cljs.core.PersistentArrayMap.fromArray([cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940275E3), new cljs.core.Keyword(null, "a-mod", "a-mod", 1104934664), cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940276E3), new cljs.core.Keyword(null, "b", "b", 1013904340), cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940277E3), new cljs.core.Keyword(null, 
         "c-mod", "c-mod", 1106781706)], true, false), cljs.core.list(new cljs.core.Symbol(null, "-\x3e", "-\x3e", -1640530070, null), cljs.core.list(new cljs.core.Symbol(null, "update-charts-data", "update-charts-data", -1234028329, null), new cljs.core.Symbol(null, "charts-data", "charts-data", -1611934757, null), new cljs.core.Symbol(null, "source-id", "source-id", 955977158, null), new cljs.core.PersistentArrayMap.fromArray([cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, 
         null), 1390940275E3), new cljs.core.Keyword(null, "a-mod", "a-mod", 1104934664), cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940277E3), new cljs.core.Keyword(null, "c-mod", "c-mod", 1106781706)], true, false)), new cljs.core.Keyword(null, "charts", "charts", 3947239367), new cljs.core.Symbol(null, "first", "first", -1543091095, null), new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081)))], null));
       } else {
-        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), cljs.core._conj.call(null, cljs.core._conj.call(null, cljs.core.List.EMPTY, cljs.core.cons.call(null, new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), values__8799__auto__)), new cljs.core.Symbol(null, "not", "not", -1640422260, null)), new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "fail", "fail", 
+        cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), cljs.core._conj.call(null, cljs.core._conj.call(null, cljs.core.List.EMPTY, cljs.core.cons.call(null, new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), values__8749__auto__)), new cljs.core.Symbol(null, "not", "not", -1640422260, null)), new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "fail", "fail", 
         1017039504), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), new cljs.core.PersistentArrayMap.fromArray([cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940275E3), new cljs.core.Keyword(null, "a-mod", "a-mod", 1104934664), cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, 
         null), 1390940276E3), new cljs.core.Keyword(null, "b", "b", 1013904340), cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940277E3), new cljs.core.Keyword(null, "c-mod", "c-mod", 1106781706)], true, false), cljs.core.list(new cljs.core.Symbol(null, "-\x3e", "-\x3e", -1640530070, null), cljs.core.list(new cljs.core.Symbol(null, "update-charts-data", "update-charts-data", -1234028329, null), new cljs.core.Symbol(null, "charts-data", "charts-data", -1611934757, 
         null), new cljs.core.Symbol(null, "source-id", "source-id", 955977158, null), new cljs.core.PersistentArrayMap.fromArray([cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940275E3), new cljs.core.Keyword(null, "a-mod", "a-mod", 1104934664), cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940277E3), new cljs.core.Keyword(null, "c-mod", "c-mod", 1106781706)], true, false)), new cljs.core.Keyword(null, "charts", "charts", 
         3947239367), new cljs.core.Symbol(null, "first", "first", -1543091095, null), new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081)))], null));
       }
-      return result__8800__auto__;
-    } catch (e8937) {
-      if (e8937 instanceof Error) {
-        var t__8836__auto__ = e8937;
-        return cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), t__8836__auto__, new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "error", "error", 1110689146), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), 
+      return result__8750__auto__;
+    } catch (e8887) {
+      if (e8887 instanceof Error) {
+        var t__8786__auto__ = e8887;
+        return cemerick.cljs.test.do_report.call(null, new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null, "actual", "actual", 3885931776), t__8786__auto__, new cljs.core.Keyword(null, "type", "type", 1017479852), new cljs.core.Keyword(null, "error", "error", 1110689146), new cljs.core.Keyword(null, "message", "message", 1968829305), null, new cljs.core.Keyword(null, "expected", "expected", 3373152810), cljs.core.list(new cljs.core.Symbol(null, "\x3d", "\x3d", -1640531466, null), 
         new cljs.core.PersistentArrayMap.fromArray([cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940275E3), new cljs.core.Keyword(null, "a-mod", "a-mod", 1104934664), cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940276E3), new cljs.core.Keyword(null, "b", "b", 1013904340), cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940277E3), new cljs.core.Keyword(null, "c-mod", "c-mod", 
         1106781706)], true, false), cljs.core.list(new cljs.core.Symbol(null, "-\x3e", "-\x3e", -1640530070, null), cljs.core.list(new cljs.core.Symbol(null, "update-charts-data", "update-charts-data", -1234028329, null), new cljs.core.Symbol(null, "charts-data", "charts-data", -1611934757, null), new cljs.core.Symbol(null, "source-id", "source-id", 955977158, null), new cljs.core.PersistentArrayMap.fromArray([cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940275E3), 
         new cljs.core.Keyword(null, "a-mod", "a-mod", 1104934664), cljs.core.list(new cljs.core.Symbol("js", "Date.", "js/Date.", -1574508510, null), 1390940277E3), new cljs.core.Keyword(null, "c-mod", "c-mod", 1106781706)], true, false)), new cljs.core.Keyword(null, "charts", "charts", 3947239367), new cljs.core.Symbol(null, "first", "first", -1543091095, null), new cljs.core.Keyword(null, "raw-data", "raw-data", 1470834081)))], null));
       } else {
         if (new cljs.core.Keyword(null, "else", "else", 1017020587)) {
-          throw e8937;
+          throw e8887;
         } else {
           return null;
         }
       }
     }
   } finally {
-    cemerick.cljs.test._STAR_testing_contexts_STAR_ = _STAR_testing_contexts_STAR_8936;
+    cemerick.cljs.test._STAR_testing_contexts_STAR_ = _STAR_testing_contexts_STAR_8886;
   }
 });
 cemerick.cljs.test.register_test_BANG_.call(null, new cljs.core.Symbol(null, "realtime-chart.core-test", "realtime-chart.core-test", 735904071, null), realtime_chart.core_test.data_manipulation);

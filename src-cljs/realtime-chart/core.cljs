@@ -50,12 +50,14 @@
     (apply dissoc chart-data outdated)))
 
 (defn update-charts-data [charts-data source-id raw-data]
-  (let [chart (get-in charts-data [:charts source-id])
-        chart-data (get chart :raw-data (sorted-map))
-        new-chart-data (into chart-data raw-data)
-        oldest-timestamp (get-oldest-timestamp (:display charts-data) (:display chart) new-chart-data)
-        latest-chart-data (filter-old-data new-chart-data oldest-timestamp)]
-    (assoc-in charts-data [:charts source-id :raw-data] latest-chart-data)))
+  (if (not (empty? raw-data))
+    (let [chart (get-in charts-data [:charts source-id])
+          chart-data (get chart :raw-data (sorted-map))
+          new-chart-data (into chart-data raw-data)
+          oldest-timestamp (get-oldest-timestamp (:display charts-data) (:display chart) new-chart-data)
+          latest-chart-data (filter-old-data new-chart-data oldest-timestamp)]
+      (assoc-in charts-data [:charts source-id :raw-data] latest-chart-data))
+    charts-data))
 
 (defn transition-charts [old-charts-data new-charts-data fading?]
   (when (not @fading?)
