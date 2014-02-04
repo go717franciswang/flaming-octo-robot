@@ -35,9 +35,15 @@
     var options = {queryInterval: 1000,
                    containerSelector: "#mydiv3",
                    interval: 5000,
-                   gchartOptions: {curveType: "function",
-                                   width: 800,
-                                   height: 300},
+                   gchartOptions: {
+                     curveType: "function",
+                     width: 800,
+                     height: 300,
+                     animation: {
+                       duration: 500,
+                       easing: "out",
+                     },
+                   },
                    display: 60000};
     var data_sources = [{gchartOptions: {title: "Memory Usage (60 sec window)"},
                          url: "freemem.php",

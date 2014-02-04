@@ -60,6 +60,8 @@ view demo at resources/public/index.html
 - [x] reduce the memory usage, it should stabilize instead of constantly rising
 - [x] call ```build_charts_from_js``` function in js
 - [x] cljs tests
+- [ ] bind left and right arrow key to switch charts
+- [ ] gchart animation sometimes have "Cannot read property 'type' of undefined error" when transitioning to a new chart with different number of legends than the original
 - [?] make it into a library so other cljs can use it
 
 ## License
