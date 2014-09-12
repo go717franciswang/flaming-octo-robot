@@ -31,20 +31,28 @@
 (defn transition-chan [interval start-source-id source-count charts-data]
   (let [rc (chan)
         active-source-id (atom start-source-id)
+        interval-id (atom nil)
         transition-to (fn t [operation]
                         (let [next-source-id (mod (operation @active-source-id) source-count)]
                           (reset! active-source-id next-source-id)
                           (put! rc [:transition @active-source-id source-count])))
         transition-next #(transition-to inc)
         transition-prev #(transition-to dec)
-        ]
+        transition-toggle ((fn []
+                            (if (and interval (> source-count 1))
+                              (fn []
+                                (if (nil? @interval-id)
+                                  (reset! interval-id (js/setInterval transition-next interval))
+                                  (do
+                                    (js/clearInterval @interval-id)
+                                    (reset! interval-id nil))))
+                              (fn []))))]
 
-    ; 37 left arrow, 39 right arrow
+    ; 37 Left Arrow, 39 Right Arrow, 13 Enter
     (c/add-keypress-listener-to-chart 37 transition-prev charts-data)
-    (c/add-keypress-listener-to-chart 39 transition-prev charts-data)
-
-    (when (and interval (> source-count 1))
-      (js/setInterval transition-next interval))
+    (c/add-keypress-listener-to-chart 39 transition-next charts-data)
+    (c/add-keypress-listener-to-chart 13 transition-toggle charts-data)
+    (transition-toggle)
     rc))
 
 (defn get-oldest-timestamp [default-display display chart-data]
