@@ -35,8 +35,17 @@
         data (add-rows visible-chart)]
     (.draw chart data options)))
 
+(defn get-physical-chart [charts-data]
+  ($ (:containerSelector charts-data)))
+
+(defn add-keypress-listener-to-chart [key-id func charts-data]
+  (.keydown ($ js/document)
+             (fn [e]
+               (when (= (.-which e) key-id)
+                 (func)))))
+
 (defn fade-out-chart [charts-data onfinish]
-  (fade-out ($ (:containerSelector charts-data)) 400 onfinish))
+  (fade-out (get-physical-chart charts-data) 400 onfinish))
 
 (defn fade-in-chart [charts-data onfinish]
-  (fade-in ($ (:containerSelector charts-data)) 1000 onfinish))
+  (fade-in (get-physical-chart charts-data) 1000 onfinish))

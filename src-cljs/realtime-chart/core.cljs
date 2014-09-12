@@ -28,14 +28,23 @@
     (query)
     rc))
 
-(defn transition-chan [interval start-source-id source-count]
+(defn transition-chan [interval start-source-id source-count charts-data]
   (let [rc (chan)
-        transition (fn t [source-id]
-                     (put! rc [:transition source-id source-count])
-                     (let [next-source-id (mod (inc source-id) source-count)]
-                       (js/setTimeout #(t next-source-id)  interval)))]
-  (when (and interval (> source-count 1))
-      (transition start-source-id))
+        active-source-id (atom start-source-id)
+        transition-to (fn t [operation]
+                        (let [next-source-id (mod (operation @active-source-id) source-count)]
+                          (reset! active-source-id next-source-id)
+                          (put! rc [:transition @active-source-id source-count])))
+        transition-next #(transition-to inc)
+        transition-prev #(transition-to dec)
+        ]
+
+    ; 37 left arrow, 39 right arrow
+    (c/add-keypress-listener-to-chart 37 transition-prev charts-data)
+    (c/add-keypress-listener-to-chart 39 transition-prev charts-data)
+
+    (when (and interval (> source-count 1))
+      (js/setInterval transition-next interval))
     rc))
 
 (defn get-oldest-timestamp [default-display display chart-data]
@@ -95,7 +104,8 @@
                          :let [data-source (get data-sources source-id)
                                url (:url data-source)]]
                      (data-chan source-id url (:queryInterval options))))
-        transition-chan (transition-chan (:interval charts-data) 0 (count data-sources))
+        transition-chan (transition-chan 
+                          (:interval charts-data) 0 (count data-sources) charts-data)
         all-chans (conj data-chans transition-chan)
         fading? (atom false)]
     (go
