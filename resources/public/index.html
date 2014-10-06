@@ -55,9 +55,42 @@
     realtime_chart.core.build_charts_from_js(options, data_sources);
   };
 
+  chart4 = function() {
+    var options = {queryInterval: 1000,
+                   chartConstructor: function(opt) { return new google.visualization.ColumnChart(opt) },
+                   containerSelector: "#mydiv4",
+                   gchartOptions: {curveType: "function",
+                                   width: 800,
+                                   height: 300},
+                   display: 60000};
+    var data_sources = [{gchartOptions: {title: "ColumnChart"},
+                         url: "freemem.php",
+                         columns: ["free mem"]}];
+    realtime_chart.core.build_charts_from_js(options, data_sources);
+  };
+
+  chart5 = function() {
+    var options = {queryInterval: 1000,
+                   chartConstructor: function(opt) { return new google.visualization.ComboChart(opt) },
+                   containerSelector: "#mydiv5",
+                   gchartOptions: {curveType: "function",
+                                   width: 800,
+                                   height: 300,
+                                   seriesType: "line",
+                                   series: {1: {type: "bars"}}
+                   },
+                   display: 60000};
+    var data_sources = [{gchartOptions: {title: "ComboChart"},
+                         url: "freemem.php",
+                         columns: ["free mem", "cached"]}];
+    realtime_chart.core.build_charts_from_js(options, data_sources);
+  };
+
   google.setOnLoadCallback(chart1);
   google.setOnLoadCallback(chart2);
   google.setOnLoadCallback(chart3);
+  google.setOnLoadCallback(chart4);
+  google.setOnLoadCallback(chart5);
 
   </script>
 </head>
@@ -72,6 +105,9 @@
   </div>
 
   <div id="mydiv4">
+  </div>
+
+  <div id="mydiv5">
   </div>
 </body>
 </html>

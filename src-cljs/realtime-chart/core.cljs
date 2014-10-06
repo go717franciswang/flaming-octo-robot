@@ -104,10 +104,14 @@
 ;           {..}..]}
 
 (defn build-charts [options data-sources]
-  (let [charts-data (conj options
+  (let [selector (:containerSelector options)
+        chart (if (contains? options :chartConstructor)
+                (c/get-chart-from-constructor (:chartConstructor options) selector)
+                (c/get-chart selector))
+        charts-data (conj options
                           [:visible 0]
                           [:charts data-sources]
-                          [:chart (c/get-chart (:containerSelector options))])
+                          [:chart chart])
         data-chans (doall (for [source-id (range (count data-sources))
                          :let [data-source (get data-sources source-id)
                                url (:url data-source)]]

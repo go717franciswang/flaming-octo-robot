@@ -21,8 +21,11 @@
   (let [options (into default-options options)]
     (clj->js options)))
 
+(defn get-chart-from-constructor [constructor selector]
+  (constructor (.get ($ selector) 0)))
+
 (defn get-chart [selector]
-  (js/google.visualization.LineChart. (.get ($ selector) 0)))
+  (get-chart-from-constructor #(js/google.visualization.LineChart. %1) selector))
 
 (.load js/google "visualization" "1" (clj->js {:packages ["corechart"]}))
 
